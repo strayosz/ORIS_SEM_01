@@ -71,20 +71,22 @@ public class UserRepositoryImpl {
             user.setId(id);
         }
 
-        statement.close();
         resultSet.close();
+        statement.close();
+
 
         //Вставляем пользователя
         String sqlInsert = """
-            insert into accounts(login, password, name, surname, role) values (?, ?, ?, ?, ?);
+            insert into accounts(account_id, login, password, name, surname, role) values (?, ?, ?, ?, ?, ?);
             """;
 
         statement = connection.prepareStatement(sqlInsert);
-        statement.setString(1, user.getLogin());
-        statement.setString(2, user.getPassword());
-        statement.setString(3, user.getName());
-        statement.setString(4, user.getSurname());
-        statement.setString(5, user.getRole());
+        statement.setLong  (1, user.getId());
+        statement.setString(2, user.getLogin());
+        statement.setString(3, user.getPassword());
+        statement.setString(4, user.getName());
+        statement.setString(5, user.getSurname());
+        statement.setString(6, user.getRole());
         statement.executeUpdate();
 
         statement.close();
@@ -110,6 +112,29 @@ public class UserRepositoryImpl {
         connection.close();
 
         return password;
+    }
+
+    public void updateUser(User user) throws SQLException, ClassNotFoundException {
+        Connection connection = DBConnection.getConnection();
+        connection.setAutoCommit(false);
+
+        String sql = """
+            update accounts
+            set login = ?, password = ?, name = ?, surname = ?, role = ?
+            where account_id = ?;
+            """;
+
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setString(1, user.getLogin());
+        statement.setString(2, user.getPassword());
+        statement.setString(3, user.getName());
+        statement.setString(4, user.getSurname());
+        statement.setString(5, user.getRole());
+        statement.setLong  (6, user.getId());
+        statement.executeUpdate();
+
+        connection.commit();
+        connection.close();
     }
 
     private User mapUser(ResultSet resultSet) throws SQLException {
