@@ -17,3 +17,6 @@
     </div>
     <input type="submit" value="Готово">
 </form>
+<form action="/slotSwap/home" method="get">
+    <input type="submit" value="Домой">
+</form>

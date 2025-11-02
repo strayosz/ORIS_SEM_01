@@ -27,7 +27,7 @@ public class UserService {
     public User findUserByLogin(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         try {
-            return userRepository.findUserByLogin(String.valueOf(session.getAttribute("user")))
+            return userRepository.findUserByLogin(String.valueOf(session.getAttribute("userLogin")))
                     .orElseThrow(() -> new NoSuchUserException("Пользователя с таким логином не существует"));
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -76,7 +76,7 @@ public class UserService {
                 return resource;
             }
 
-            session.setAttribute("user", login);
+            session.setAttribute("userLogin", login);
             return "/home.ftl";
         }
     }
@@ -115,7 +115,7 @@ public class UserService {
 
         String resource = "/home.ftl";
 
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("userLogin") == null) {
             String login = request.getParameter("login");
             String password = request.getParameter("password");
 
@@ -131,7 +131,7 @@ public class UserService {
                     } else {
                         if (Password.matches(password, userPassword)) {
                             session = request.getSession(true);
-                            session.setAttribute("user", login);
+                            session.setAttribute("userLogin", login);
                         } else {
                             request.setAttribute("errormessage", "Неверный пароль, попробуйте еще раз!");
                             resource = "/login.ftl";

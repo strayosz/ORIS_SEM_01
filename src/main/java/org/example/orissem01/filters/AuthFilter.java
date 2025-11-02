@@ -16,7 +16,7 @@ public class AuthFilter implements Filter {
         HttpSession session = ((HttpServletRequest) request).getSession(false);
 
         if (!checkExcluded(((HttpServletRequest) request).getServletPath())
-                && (session == null || session.getAttribute("user") == null)){
+                && (session == null || session.getAttribute("userLogin") == null)){
             ((HttpServletResponse) response).sendRedirect("/slotSwap/login");
         } else {
             filterChain.doFilter(request, response);
