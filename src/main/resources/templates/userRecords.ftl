@@ -17,10 +17,10 @@
         <tbody>
         <#list sheduledAndExchangedRecords as record>
             <tr>
-                <td data-label="Тип">${record.type}</td>
-                <td data-label="Дата">${record.date}</td>
-                <td data-label="Время">${record.time}</td>
-                <td data-label="Название">${record.name!"Отсутствует"}</td>
+                <td data-label="Тип">${record.userSlot.slot.type}</td>
+                <td data-label="Дата">${record.userSlot.slot.date}</td>
+                <td data-label="Время">${record.userSlot.slot.time}</td>
+                <td data-label="Название">${record.userSlot.slot.name!"Отсутствует"}</td>
                 <td data-label="Статус">${record.status}</td>
             </tr>
         </#list>
@@ -30,15 +30,15 @@
 <div style="color:red">${errormessage!}</div>
 <form method="post" action="/slotSwap/user/records">
     <div>
-        <label>Выбрать смену для обмена</label>
+        <label>Выбрать смену для передачи</label>
         <select name="choosedRecordId">
             <#list sheduledRecords as record>
-                <option value = "${record.id}">${record.type}, ${record.date}, ${record.time}, ${record.status}</option>
+                <option value = "${record.userSlot.id}">${record.userSlot.slot.type}, ${record.userSlot.slot.date}, ${record.userSlot.slot.time}, ${record.status}</option>
             </#list>
         </select>
     </div>
     <div>
-        <input type="submit" value="Выставить на обмен">
+        <input type="submit" value="Отдать">
     </div>
 </form>
 <h1>
@@ -60,10 +60,10 @@
         <tbody>
         <#list completedRecords as record>
             <tr>
-                <td data-label="Тип">${record.type}</td>
-                <td data-label="Дата">${record.date}</td>
-                <td data-label="Время">${record.time}</td>
-                <td data-label="Название">${record.name!"Отсутствует"}</td>
+                <td data-label="Тип">${record.userSlot.slot.type}</td>
+                <td data-label="Дата">${record.userSlot.slot.date}</td>
+                <td data-label="Время">${record.userSlot.slot.time}</td>
+                <td data-label="Название">${record.userSlot.slot.name!"Отсутствует"}</td>
                 <td data-label="Количество чатов">${record.chatsCount!"Не заполнено"}</td>
                 <td data-label="Комментарий">${record.comment!"Отсутствует"}</td>
                 <td data-label="Статус">${record.status}</td>

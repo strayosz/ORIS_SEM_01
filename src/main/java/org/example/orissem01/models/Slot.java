@@ -1,12 +1,31 @@
 package org.example.orissem01.models;
 
+import java.util.List;
+
 public class Slot {
     private Long id;
     private String name;
     private String date;
     private String time;
     private String type;
-    private boolean exchange;
+    private List<User> users;
+    private List<Record> records;
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+    public List<Record> getRecords() {
+        return records;
+    }
+
+    public void setRecords(List<Record> records) {
+        this.records = records;
+    }
 
     public Long getId() {
         return id;
@@ -48,14 +67,6 @@ public class Slot {
         this.type = type;
     }
 
-    public boolean isExchange() {
-        return exchange;
-    }
-
-    public void setExchange(boolean exchange) {
-        this.exchange = exchange;
-    }
-
     @Override
     public String toString() {
         return "Slot{" +
@@ -64,7 +75,6 @@ public class Slot {
                 ", date='" + date + '\'' +
                 ", time='" + time + '\'' +
                 ", type='" + type + '\'' +
-                ", exchange=" + exchange +
                 '}';
     }
 }

@@ -1,5 +1,7 @@
 package org.example.orissem01.models;
 
+import java.util.List;
+
 public class User {
     private Long id;
     private String login;
@@ -7,6 +9,24 @@ public class User {
     private String name;
     private String surname;
     private String role;
+    private List<Slot> slots;
+    private List<Record> records;
+
+    public List<Slot> getSlots() {
+        return slots;
+    }
+
+    public void setSlots(List<Slot> slots) {
+        this.slots = slots;
+    }
+
+    public List<Record> getRecords() {
+        return records;
+    }
+
+    public void setRecords(List<Record> records) {
+        this.records = records;
+    }
 
     public Long getId() {
         return id;

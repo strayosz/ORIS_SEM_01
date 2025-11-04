@@ -1,6 +1,7 @@
 package org.example.orissem01.repositories;
 
 import org.example.orissem01.models.Slot;
+import org.example.orissem01.models.User;
 import org.example.orissem01.utils.DBConnection;
 
 import java.sql.Connection;
@@ -32,7 +33,7 @@ public class SlotRepositoryImpl {
 
         //Вставляем слот
         String sqlInsert = """
-            insert into slots(slot_id, name, date, time, type) values (?, ?, ?, ?, ?, ?);
+            insert into slots(slot_id, name, date, time, type) values (?, ?, ?, ?, ?);
             """;
 
         statement = connection.prepareStatement(sqlInsert);
@@ -41,7 +42,6 @@ public class SlotRepositoryImpl {
         statement.setString (3, slot.getDate());
         statement.setString (4, slot.getTime());
         statement.setString (5, slot.getType());
-        statement.setBoolean(6, slot.isExchange());
         statement.executeUpdate();
 
         statement.close();
@@ -73,39 +73,72 @@ public class SlotRepositoryImpl {
         return Optional.ofNullable(slot);
     }
 
-    public List<Slot> getSlotsByUserId(Long userId) throws SQLException, ClassNotFoundException {
+    public Optional<Slot> findSlotById(Long id) throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getConnection();
-        List<Slot> slots = new ArrayList<>();
         String sql = """
-            select s.slot_id, name, date, time, type
-            from slots s
-            join account_slot as acs on s.slot_id = acs.slot_id
-            where account_id = ? AND date >= current_date AND time >= current_time
-            order by date, time
+            select slot_id, name, date, time, type
+            from slots
+            where slot_id = ?
             """;
         PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setLong(1, userId);
+        statement.setLong(1, id);
         ResultSet resultSet = statement.executeQuery();
 
-        while(resultSet.next()){
-            slots.add(mapSlot(resultSet));
+        Slot slot = null;
+        if(resultSet.next()){
+            slot = mapSlot(resultSet);
         }
 
         statement.close();
         resultSet.close();
         connection.close();
 
-        return slots;
+        return Optional.ofNullable(slot);
     }
 
-    private Slot mapSlot(ResultSet resultSet) throws SQLException {
+    private List<User> getUsersBySlotId(Long slotId) throws SQLException, ClassNotFoundException {
+        Connection connection = DBConnection.getConnection();
+        List<User> users = new ArrayList<>();
+        String sql = """
+            select a.account_id, login, password, name, surname, role
+            from accounts a
+            join account_slot as acs on a.account_id = acs.account_id
+            where slot_id = ?
+            """;
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setLong(1, slotId);
+        ResultSet resultSet = statement.executeQuery();
+
+        while(resultSet.next()){
+            users.add(mapUser(resultSet));
+        }
+
+        statement.close();
+        resultSet.close();
+        connection.close();
+
+        return users;
+    }
+
+    private Slot mapSlot(ResultSet resultSet) throws SQLException, ClassNotFoundException {
         Slot slot = new Slot();
         slot.setId      (resultSet.getLong  ("slot_id"));
         slot.setName    (resultSet.getString("name"));
         slot.setDate    (resultSet.getString("date"));
         slot.setTime    (resultSet.getString("time"));
         slot.setType    (resultSet.getString("type"));
-        slot.setExchange(resultSet.getBoolean("exchange"));
+        slot.setUsers(getUsersBySlotId(slot.getId()));
         return slot;
+    }
+
+    private User mapUser(ResultSet resultSet) throws SQLException, ClassNotFoundException {
+        User user = new User();
+        user.setId      (resultSet.getLong  ("account_id"));
+        user.setLogin   (resultSet.getString("login"));
+        user.setPassword(resultSet.getString("password"));
+        user.setName    (resultSet.getString("name"));
+        user.setSurname (resultSet.getString("surname"));
+        user.setRole    (resultSet.getString("role"));
+        return user;
     }
 }

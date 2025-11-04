@@ -1,5 +1,6 @@
 package org.example.orissem01.repositories;
 
+import org.example.orissem01.models.Slot;
 import org.example.orissem01.models.User;
 import org.example.orissem01.utils.DBConnection;
 
@@ -43,6 +44,29 @@ public class UserRepositoryImpl {
             """;
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setString(1, login);
+        ResultSet resultSet = statement.executeQuery();
+
+        User user = null;
+        if(resultSet.next()){
+            user = mapUser(resultSet);
+        }
+
+        statement.close();
+        resultSet.close();
+        connection.close();
+
+        return Optional.ofNullable(user);
+    }
+
+    public Optional<User> findUserById(Long id) throws SQLException, ClassNotFoundException {
+        Connection connection = DBConnection.getConnection();
+        String sql = """
+            select account_id, login, password, name, surname, role
+            from accounts
+            where account_id = ?
+            """;
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setLong(1, id);
         ResultSet resultSet = statement.executeQuery();
 
         User user = null;
@@ -138,7 +162,32 @@ public class UserRepositoryImpl {
         connection.close();
     }
 
-    private User mapUser(ResultSet resultSet) throws SQLException {
+    private List<Slot> getSlotsByUserId(Long userId) throws SQLException, ClassNotFoundException {
+        Connection connection = DBConnection.getConnection();
+        List<Slot> slots = new ArrayList<>();
+        String sql = """
+            select s.slot_id, name, date, time, type
+            from slots s
+            join account_slot as acs on s.slot_id = acs.slot_id
+            where account_id = ?
+            order by date, time
+            """;
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setLong(1, userId);
+        ResultSet resultSet = statement.executeQuery();
+
+        while(resultSet.next()){
+            slots.add(mapSlot(resultSet));
+        }
+
+        statement.close();
+        resultSet.close();
+        connection.close();
+
+        return slots;
+    }
+
+    private User mapUser(ResultSet resultSet) throws SQLException, ClassNotFoundException {
         User user = new User();
         user.setId      (resultSet.getLong  ("account_id"));
         user.setLogin   (resultSet.getString("login"));
@@ -146,6 +195,17 @@ public class UserRepositoryImpl {
         user.setName    (resultSet.getString("name"));
         user.setSurname (resultSet.getString("surname"));
         user.setRole    (resultSet.getString("role"));
+        user.setSlots(getSlotsByUserId(user.getId()));
         return user;
+    }
+
+    private Slot mapSlot(ResultSet resultSet) throws SQLException {
+        Slot slot = new Slot();
+        slot.setId      (resultSet.getLong  ("slot_id"));
+        slot.setName    (resultSet.getString("name"));
+        slot.setDate    (resultSet.getString("date"));
+        slot.setTime    (resultSet.getString("time"));
+        slot.setType    (resultSet.getString("type"));
+        return slot;
     }
 }

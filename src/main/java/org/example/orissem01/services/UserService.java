@@ -3,10 +3,7 @@ package org.example.orissem01.services;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.example.orissem01.exceptions.NoSuchUserException;
-import org.example.orissem01.models.Record;
 import org.example.orissem01.models.User;
-import org.example.orissem01.repositories.RecordRepository;
-import org.example.orissem01.repositories.SlotRepositoryImpl;
 import org.example.orissem01.repositories.UserRepositoryImpl;
 import org.example.orissem01.utils.Password;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,13 +14,8 @@ import java.util.List;
 public class UserService {
 
     private final UserRepositoryImpl userRepository;
-    private final SlotRepositoryImpl slotRepository;
-    private final RecordRepository recordRepository;
-
     public UserService() {
         this.userRepository = new UserRepositoryImpl();
-        this.slotRepository = new SlotRepositoryImpl();
-        this.recordRepository = new RecordRepository();
     }
 
     public void getAll(HttpServletRequest request) throws SQLException, ClassNotFoundException {
@@ -151,43 +143,6 @@ public class UserService {
             }
         }
 
-        return resource;
-    }
-
-    public String getUserRecords(HttpServletRequest request) {
-        User user = findUserByLogin(request);
-        try {
-            List<Record> sheduledAndExchangedRecords = recordRepository.getSheduledAndExchangedRecordsByUserId(user.getId());
-            request.setAttribute("sheduledAndExchangedRecords", sheduledAndExchangedRecords);
-            List<Record> sheduledRecords = recordRepository.getSheduledRecordsByUserId(user.getId());
-            request.setAttribute("sheduledRecords", sheduledRecords);
-            List<Record> completedRecords = recordRepository.getCompletedRecordsByUserId(user.getId());
-            request.setAttribute("completedRecords", completedRecords);
-            return "/userRecords.ftl";
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public String updateUserRecord(HttpServletRequest request) {
-        String resource = "/userRecords.ftl";
-        try {
-            User user = findUserByLogin(request);
-            List<Record> sheduledRecords = recordRepository.getSheduledRecordsByUserId(user.getId());
-            if (sheduledRecords.isEmpty()) {
-                request.setAttribute("errormessage", "Нет доступных для обмена смен");
-                return resource;
-            }
-            Long id = Long.parseLong(request.getParameter("choosedRecordId"));
-            for(Record record: sheduledRecords) {
-                if (record.getId().equals(id)){
-                    record.setStatus("Обмен");
-                    recordRepository.updateRecord(record);
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
         return resource;
     }
 
