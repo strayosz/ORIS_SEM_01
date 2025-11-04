@@ -1,5 +1,6 @@
 package org.example.orissem01.repositories;
 
+import org.example.orissem01.models.Record;
 import org.example.orissem01.models.Slot;
 import org.example.orissem01.models.User;
 import org.example.orissem01.utils.DBConnection;
@@ -96,6 +97,46 @@ public class SlotRepositoryImpl {
         return Optional.ofNullable(slot);
     }
 
+    private List<Record> getRecordsBySlotId(Long slotId) throws SQLException, ClassNotFoundException {
+        Connection connection = DBConnection.getConnection();
+        List<org.example.orissem01.models.Record> records = new ArrayList<>();
+        String sql = """
+            select r.account_slot_id, r.chats_count, r.status, r.comment,
+                   a.account_id, login, password, name, surname, role
+            from accounts a
+            join account_slot acs on a.account_id = acs.account_id
+            join records r on acs.account_slot_id = r.account_slot_id
+            where slot_id = ?
+            """;
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setLong(1, slotId);
+        ResultSet resultSet = statement.executeQuery();
+
+        while(resultSet.next()){
+            records.add(mapRecord(resultSet));
+        }
+
+        statement.close();
+        resultSet.close();
+        connection.close();
+
+        return records;
+    }
+
+    private Record mapRecord(ResultSet resultSet) throws SQLException, ClassNotFoundException {
+        Record record = new Record();
+        User user = mapUser(resultSet);
+
+        record.setId(resultSet.getLong ("account_slot_id"));
+
+        record.setUser(user);
+
+        record.setChatsCount(resultSet.getInt("chats_count"));
+        record.setStatus(resultSet.getString("status"));
+        record.setComment(resultSet.getString("comment"));
+        return record;
+    }
+
     private List<User> getUsersBySlotId(Long slotId) throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getConnection();
         List<User> users = new ArrayList<>();
@@ -122,12 +163,14 @@ public class SlotRepositoryImpl {
 
     private Slot mapSlot(ResultSet resultSet) throws SQLException, ClassNotFoundException {
         Slot slot = new Slot();
-        slot.setId      (resultSet.getLong  ("slot_id"));
+        Long id = resultSet.getLong  ("slot_id");
+        slot.setId      (id);
         slot.setName    (resultSet.getString("name"));
         slot.setDate    (resultSet.getString("date"));
         slot.setTime    (resultSet.getString("time"));
         slot.setType    (resultSet.getString("type"));
-        slot.setUsers(getUsersBySlotId(slot.getId()));
+        slot.setUsers(getUsersBySlotId(id));
+        slot.setRecords(getRecordsBySlotId(id));
         return slot;
     }
 

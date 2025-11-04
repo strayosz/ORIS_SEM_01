@@ -17,10 +17,10 @@
         <tbody>
         <#list sheduledAndExchangedRecords as record>
             <tr>
-                <td data-label="Тип">${record.userSlot.slot.type}</td>
-                <td data-label="Дата">${record.userSlot.slot.date}</td>
-                <td data-label="Время">${record.userSlot.slot.time}</td>
-                <td data-label="Название">${record.userSlot.slot.name!"Отсутствует"}</td>
+                <td data-label="Тип">${record.slot.type}</td>
+                <td data-label="Дата">${record.slot.date}</td>
+                <td data-label="Время">${record.slot.time}</td>
+                <td data-label="Название">${record.slot.name!"Отсутствует"}</td>
                 <td data-label="Статус">${record.status}</td>
             </tr>
         </#list>
@@ -33,7 +33,7 @@
         <label>Выбрать смену для передачи</label>
         <select name="choosedRecordId">
             <#list sheduledRecords as record>
-                <option value = "${record.userSlot.id}">${record.userSlot.slot.type}, ${record.userSlot.slot.date}, ${record.userSlot.slot.time}, ${record.status}</option>
+                <option value = "${record.id}">${record.slot.type}, ${record.slot.date}, ${record.slot.time}, ${record.status}</option>
             </#list>
         </select>
     </div>
@@ -60,10 +60,10 @@
         <tbody>
         <#list completedRecords as record>
             <tr>
-                <td data-label="Тип">${record.userSlot.slot.type}</td>
-                <td data-label="Дата">${record.userSlot.slot.date}</td>
-                <td data-label="Время">${record.userSlot.slot.time}</td>
-                <td data-label="Название">${record.userSlot.slot.name!"Отсутствует"}</td>
+                <td data-label="Тип">${record.slot.type}</td>
+                <td data-label="Дата">${record.slot.date}</td>
+                <td data-label="Время">${record.slot.time}</td>
+                <td data-label="Название">${record.slot.name!"Отсутствует"}</td>
                 <td data-label="Количество чатов">${record.chatsCount!"Не заполнено"}</td>
                 <td data-label="Комментарий">${record.comment!"Отсутствует"}</td>
                 <td data-label="Статус">${record.status}</td>

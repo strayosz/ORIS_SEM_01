@@ -8,6 +8,14 @@ public class Record {
     private String status;
     private String comment;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public User getUser() {
         return user;
     }
@@ -48,4 +56,15 @@ public class Record {
         this.comment = comment;
     }
 
+    @Override
+    public String toString() {
+        return "Record{" +
+                "id=" + id +
+                ", user=" + user +
+                ", slot=" + slot +
+                ", chatsCount=" + chatsCount +
+                ", status='" + status + '\'' +
+                ", comment='" + comment + '\'' +
+                '}';
+    }
 }

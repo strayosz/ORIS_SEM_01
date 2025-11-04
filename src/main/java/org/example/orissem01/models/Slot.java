@@ -75,6 +75,8 @@ public class Slot {
                 ", date='" + date + '\'' +
                 ", time='" + time + '\'' +
                 ", type='" + type + '\'' +
+                ", users=" + users +
+                ", records=" + records +
                 '}';
     }
 }

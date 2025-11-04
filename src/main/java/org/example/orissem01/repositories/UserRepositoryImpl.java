@@ -1,5 +1,6 @@
 package org.example.orissem01.repositories;
 
+import org.example.orissem01.models.Record;
 import org.example.orissem01.models.Slot;
 import org.example.orissem01.models.User;
 import org.example.orissem01.utils.DBConnection;
@@ -162,6 +163,47 @@ public class UserRepositoryImpl {
         connection.close();
     }
 
+    private List<Record> getRecordsByUserId(Long userId) throws SQLException, ClassNotFoundException {
+        Connection connection = DBConnection.getConnection();
+        List<Record> records = new ArrayList<>();
+        String sql = """
+            select r.account_slot_id, r.chats_count, r.status, r.comment,
+                   s.slot_id, s.name, s.date, s.time, s.type
+            from slots s
+            join account_slot acs on s.slot_id = acs.slot_id
+            join records r on acs.account_slot_id = r.account_slot_id
+            where account_id = ?
+            order by date, time;
+            """;
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setLong(1, userId);
+        ResultSet resultSet = statement.executeQuery();
+
+        while(resultSet.next()){
+            records.add(mapRecord(resultSet));
+        }
+
+        statement.close();
+        resultSet.close();
+        connection.close();
+
+        return records;
+    }
+
+    private Record mapRecord(ResultSet resultSet) throws SQLException {
+        Record record = new Record();
+        Slot slot = mapSlot(resultSet);
+
+        record.setId(resultSet.getLong ("account_slot_id"));
+
+        record.setSlot(slot);
+
+        record.setChatsCount(resultSet.getInt("chats_count"));
+        record.setStatus(resultSet.getString("status"));
+        record.setComment(resultSet.getString("comment"));
+        return record;
+    }
+
     private List<Slot> getSlotsByUserId(Long userId) throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getConnection();
         List<Slot> slots = new ArrayList<>();
@@ -189,13 +231,15 @@ public class UserRepositoryImpl {
 
     private User mapUser(ResultSet resultSet) throws SQLException, ClassNotFoundException {
         User user = new User();
-        user.setId      (resultSet.getLong  ("account_id"));
+        Long id = resultSet.getLong  ("account_id");
+        user.setId      (id);
         user.setLogin   (resultSet.getString("login"));
         user.setPassword(resultSet.getString("password"));
         user.setName    (resultSet.getString("name"));
         user.setSurname (resultSet.getString("surname"));
         user.setRole    (resultSet.getString("role"));
-        user.setSlots(getSlotsByUserId(user.getId()));
+        user.setSlots(getSlotsByUserId(id));
+        user.setRecords(getRecordsByUserId(id));
         return user;
     }
 

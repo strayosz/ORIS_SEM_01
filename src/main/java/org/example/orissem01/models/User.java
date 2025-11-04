@@ -76,7 +76,6 @@ public class User {
         this.role = role;
     }
 
-
     @Override
     public String toString() {
         return "User{" +
@@ -86,6 +85,8 @@ public class User {
                 ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
                 ", role='" + role + '\'' +
+                ", slots=" + slots +
+                ", records=" + records +
                 '}';
     }
 }
