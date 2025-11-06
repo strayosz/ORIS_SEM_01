@@ -13,6 +13,11 @@
 <form action="/slotSwap/user/update" method="get">
     <input type="submit" value="Изменить данные">
 </form>
+<#if user.role == 'Админ'>
+    <form action="/slotSwap/admin" method="get">
+        <input type="submit" value="Админка">
+    </form>
+</#if>
 <form action="/slotSwap/user/records" method="get">
     <input type="submit" value="Посмотреть мои смены">
 </form>

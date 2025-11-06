@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public class UserService {
 
@@ -19,8 +20,13 @@ public class UserService {
         this.userRepository = new UserRepositoryImpl();
     }
 
-    public void getAll(HttpServletRequest request) throws SQLException, ClassNotFoundException {
-        List<User> users = userRepository.getUsers();
+    public void getAll(HttpServletRequest request){
+        List<User> users = null;
+        try {
+            users = userRepository.getUsers();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         request.setAttribute("users", users);
     }
 
@@ -28,6 +34,15 @@ public class UserService {
         HttpSession session = request.getSession(false);
         try {
             return userRepository.findUserByLogin(String.valueOf(session.getAttribute("userLogin")))
+                    .orElseThrow(() -> new NoSuchUserException("Пользователя с таким логином не существует"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public User findUserByLogin(String login) {
+        try {
+            return userRepository.findUserByLogin(login)
                     .orElseThrow(() -> new NoSuchUserException("Пользователя с таким логином не существует"));
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -99,7 +114,20 @@ public class UserService {
         request.setAttribute("successmessage", "Данные успешно изменены!");
         request.setAttribute("user", user);
         return resource;
+    }
 
+    public String updateUserRole(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        String resource = "/admin/users";
+        String role = request.getParameter("selectedUserRole");
+        User user = findUserByLogin((String) session.getAttribute("selectedUserLogin"));
+        user.setRole(role);
+        try {
+            userRepository.updateUser(user);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return resource;
     }
 
     public String checkUser(HttpServletRequest request) {
