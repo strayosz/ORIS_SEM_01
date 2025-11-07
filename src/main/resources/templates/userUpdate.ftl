@@ -12,8 +12,12 @@
         <input type="text" name="surname" value = "${user.surname}">
     </div>
     <div>
-        <label>Пароль</label>
-        <input type="password" name="password">
+        <label>Старый Пароль</label>
+        <input type="password" name="oldPassword">
+    </div>
+    <div>
+        <label>Новый Пароль</label>
+        <input type="password" name="newPassword">
     </div>
     <input type="submit" value="Готово">
 </form>

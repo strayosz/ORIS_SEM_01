@@ -11,7 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 public class UserService {
 
@@ -89,21 +88,28 @@ public class UserService {
     }
 
     public String updateUser(HttpServletRequest request) {
-        String resource = "/update.ftl";
+        String resource = "/userUpdate.ftl";
 
         User user = findUserByLogin(request);
 
-        String password = request.getParameter("password");
+        String newPassword = request.getParameter("newPassword");
+        String oldPassword = request.getParameter("oldPassword");
         String name = request.getParameter("name");
         String surname = request.getParameter("surname");
 
-        if (isEmptyParam(password) || isEmptyParam(name) || isEmptyParam(surname)) {
+        if (isEmptyParam(newPassword) || isEmptyParam(oldPassword)
+                || isEmptyParam(name) || isEmptyParam(surname)) {
             request.setAttribute("errormessage", "Введите корректные данные");
             request.setAttribute("user", user);
             return resource;
         }
         BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
-        user.setPassword(bCrypt.encode(password));
+        if (!bCrypt.matches(oldPassword, user.getPassword())) {
+            request.setAttribute("errormessage", "Неверный старый пароль");
+            request.setAttribute("user", user);
+            return resource;
+        }
+        user.setPassword(bCrypt.encode(newPassword));
         user.setName(name);
         user.setSurname(surname);
         try {

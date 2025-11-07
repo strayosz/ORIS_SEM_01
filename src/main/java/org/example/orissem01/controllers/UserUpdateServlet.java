@@ -9,14 +9,14 @@ import org.example.orissem01.services.UserService;
 import java.io.IOException;
 
 @WebServlet("/user/update")
-public class UpdateServlet extends HomeServlet{
+public class UserUpdateServlet extends HomeServlet{
 
     private final UserService userService = new UserService();
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setAttribute("user", userService.findUserByLogin(request));
-        request.getRequestDispatcher("/update.ftl").forward(request, response);
+        request.getRequestDispatcher("/userUpdate.ftl").forward(request, response);
     }
 
     @Override
