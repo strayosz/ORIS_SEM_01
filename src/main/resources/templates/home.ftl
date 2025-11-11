@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <title>Home</title>
-    <link rel="stylesheet" href="/slotSwap/static/css/common.css">
+    <link rel="stylesheet" href="/slotSwap/static/css/up-panel.css">
 
 </head>
 <body>
