@@ -3,7 +3,7 @@
 <head>
     <title>Edit</title>
     <link rel="stylesheet" href="/slotSwap/static/css/up-panel.css">
-
+    <link rel="stylesheet" href="/slotSwap/static/css/input.css">
 </head>
 <body>
 <div class="up-panel">
@@ -21,26 +21,33 @@
 <div style="color:red">${errormessage!}</div>
 <div style="color:greenyellow">${successmessage!}</div>
 <form action="/slotSwap/user/update" method="post">
-    <div>
-        <label>Имя</label>
-        <input type="text" name="name" value = "${user.name}">
+    <div class="form-wrapper">
+        <div>
+            <label>
+                <input type="text" name="name" value="${user.name}" placeholder="Имя">
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="text" name="surname" value="${user.surname}" placeholder="Фамилия">
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="password" name="oldPassword" placeholder="Старый Пароль">
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="password" name="newPassword" placeholder="Новый Пароль">
+            </label>
+        </div>
+        <div class="buttons" style="justify-content: center">
+            <div class="div-button">
+                <input type="submit" value="Готово" class="button-login">
+            </div>
+        </div>
     </div>
-    <div>
-        <label>Фамилия</label>
-        <input type="text" name="surname" value = "${user.surname}">
-    </div>
-    <div>
-        <label>Старый Пароль</label>
-        <input type="password" name="oldPassword">
-    </div>
-    <div>
-        <label>Новый Пароль</label>
-        <input type="password" name="newPassword">
-    </div>
-    <input type="submit" value="Готово">
-</form>
-<form action="/slotSwap/home" method="get">
-    <input type="submit" value="Домой">
 </form>
 </body>
 </html>

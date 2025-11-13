@@ -3,7 +3,10 @@
 <head>
     <title>Home</title>
     <link rel="stylesheet" href="/slotSwap/static/css/up-panel.css">
-
+    <link rel="stylesheet" href="/slotSwap/static/css/card.css">
+    <link rel="stylesheet" href="/slotSwap/static/css/input.css">
+    <link rel="stylesheet" href="/slotSwap/static/css/profile.css">
+    <script src="/slotSwap/static/js/card.js"></script>
 </head>
 <body>
 <div class="up-panel">
@@ -17,61 +20,40 @@
         <a href="/slotSwap/user" class="profile-button"></a>
     </div>
 </div>
-<h1>
-    Добро пожаловать!
-</h1>
-<form action="/slotSwap/user" method="get">
-    <input type="submit" value="Профиль">
-</form>
 <#if isEmptyExchanged??>
-    <div style="color:red">${isEmptyExchanged}</div>
+    <div class = "empty" style="margin-top: 30px">
+        <span>${isEmptyExchanged}</span>
+    </div>
 <#else>
     <h1>
         Доступные для обмена смены
     </h1>
     <div>
-        <table>
-            <thead>
-            <tr>
-                <th>Тип</th>
-                <th>Дата</th>
-                <th>Время</th>
-                <th>Название</th>
-                <th>Имя владельца</th>
-                <th>Фамилия владельца</th>
-            </tr>
-            </thead>
-            <tbody>
+        <div class="card-container">
             <#list records as record>
-                <tr>
-                    <td data-label="Тип">${record.slot.type}</td>
-                    <td data-label="Дата">${record.slot.date}</td>
-                    <td data-label="Время">${record.slot.time}</td>
-                    <td data-label="Название">${record.slot.name!"Отсутствует"}</td>
-                    <td data-label="Имя владельца">${record.user.name}</td>
-                    <td data-label="Фамилия владельца">${record.user.surname}</td>
-                </tr>
+                <div class="record-card" onclick="selectCard(this, '${record.id}')">
+                    <div class="record-title">${record.slot.name!"Без названия"}</div>
+                    <div class="record-info">
+                        <p><b>Тип</b> ${record.slot.type}</p>
+                        <p><b>Дата</b> ${record.slot.date}</p>
+                        <p><b>Время</b> ${record.slot.time}</p>
+                        <p><b>Владелец</b> ${record.user.name} ${record.user.surname}</p>
+                    </div>
+                </div>
             </#list>
-            </tbody>
-        </table>
+        </div>
+        <div class = "form-wrapper">
+            <label>
+                <input type="text" placeholder="Комментарий" name="comment">
+            </label>
+        </div>
+        <div style = "display: flex; justify-content: center">
+            <form method="post" action="/slotSwap/home">
+                <input type="hidden" id="selectedRecord" name="choosedRecordId">
+                <input type="submit" value="Взять" class = "button-login">
+            </form>
+        </div>
     </div>
-    <form method="post" action="/slotSwap/home">
-        <div>
-            <label>Выбрать смену для передачи</label>
-            <select name="choosedRecordId">
-                <#list records as record>
-                    <option value="${record.id}">${record.slot.type}, ${record.slot.date}, ${record.slot.time}, ${record.slot.name!}, ${record.user.name}, ${record.user.surname} </option>
-                </#list>
-            </select>
-        </div>
-        <div>
-            <label>Введите комментарий</label>
-            <input type="text" name="comment">
-        </div>
-        <div>
-            <input type="submit" value="Взять">
-        </div>
-    </form>
 </#if>
 </body>
 </html>

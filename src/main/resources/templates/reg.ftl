@@ -4,7 +4,6 @@
     <title>Registration</title>
     <link rel="stylesheet" href="/slotSwap/static/css/up-panel.css">
     <link rel="stylesheet" href="/slotSwap/static/css/input.css">
-
 </head>
 <body>
 <div class="up-panel">
@@ -17,6 +16,7 @@
     <div class="div-up-panel">
     </div>
 </div>
+
 <div style="color:red">${errormessage!}</div>
 
 <form action="/slotSwap/reg" method="post">
@@ -49,10 +49,7 @@
                 <input type="submit" value="Зарегестрироваться" class="button-login">
             </div>
         </div>
-
-
     </div>
 </form>
-
 </body>
 </html>

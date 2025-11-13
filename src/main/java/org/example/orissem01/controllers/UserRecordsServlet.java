@@ -21,10 +21,7 @@ public class UserRecordsServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String resource = "/userRecords.ftl";
-        if (request.getParameter("choosedRecordId") != null) {
-            resource = recordService.updateUserRecord(request);
-        }
+        String resource = recordService.updateUserRecord(request);
         recordService.getUserRecords(request);
         request.getRequestDispatcher(resource).forward(request, response);
     }
