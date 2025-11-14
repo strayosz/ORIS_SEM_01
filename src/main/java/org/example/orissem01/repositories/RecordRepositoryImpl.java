@@ -4,7 +4,7 @@ import org.example.orissem01.models.Record;
 import org.example.orissem01.models.Slot;
 import org.example.orissem01.models.User;
 import org.example.orissem01.repositories.interfaces.IRecordRepository;
-import org.example.orissem01.repositories.interfaces.IMapModel;
+import org.example.orissem01.repositories.mappers.EntityMapper;
 import org.example.orissem01.utils.DBConnection;
 
 import java.sql.Connection;
@@ -15,7 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class RecordRepositoryImpl implements IRecordRepository, IMapModel {
+public class RecordRepositoryImpl implements IRecordRepository{
+
+    private final EntityMapper entityMapper;
+
+    public RecordRepositoryImpl(EntityMapper entityMapper){
+        this.entityMapper = entityMapper;
+    }
 
     @Override
     public Optional<Record> findRecordById(Long id) throws SQLException, ClassNotFoundException {
@@ -100,10 +106,10 @@ public class RecordRepositoryImpl implements IRecordRepository, IMapModel {
     }
 
     @Override
-    public Record mapRecord(ResultSet resultSet) throws SQLException, ClassNotFoundException {
-        Record record = mapRecordDefault(resultSet);
-        User user = mapUserDefault(resultSet);
-        Slot slot = mapSlotDefault(resultSet);
+    public Record mapRecord(ResultSet resultSet) throws SQLException{
+        Record record = entityMapper.mapRecordDefault(resultSet);
+        User user = entityMapper.mapUserDefault(resultSet);
+        Slot slot = entityMapper.mapSlotDefault(resultSet);
         record.setUser(user);
         record.setSlot(slot);
         return record;

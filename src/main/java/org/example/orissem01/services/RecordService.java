@@ -1,11 +1,13 @@
 package org.example.orissem01.services;
 
-import jakarta.servlet.http.HttpServletRequest;
+import org.example.orissem01.exceptions.ConnectionException;
+import org.example.orissem01.exceptions.MySQLException;
 import org.example.orissem01.exceptions.NoSuchRecordException;
 import org.example.orissem01.models.Record;
 import org.example.orissem01.models.User;
 import org.example.orissem01.repositories.RecordRepositoryImpl;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -13,93 +15,64 @@ import java.util.function.Predicate;
 
 public class RecordService {
     private final RecordRepositoryImpl recordRepository;
-    private final UserService userService;
 
-    public RecordService() {
-        this.recordRepository = new RecordRepositoryImpl();
-        this.userService = new UserService();
+    public RecordService(RecordRepositoryImpl recordRepository) {
+        this.recordRepository = recordRepository;
     }
 
     public Record findRecordById(Long id) {
         try {
             return recordRepository.findRecordById(id)
-                    .orElseThrow(() -> new NoSuchRecordException("Пользователя с таким логином не существует"));
+                    .orElseThrow(() -> new NoSuchRecordException());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
 
-    public String getExchangedRecords(HttpServletRequest request) {
-        String resource = "/home.ftl";
+    public List<Record> getExchangedRecords(User user) throws ConnectionException, MySQLException {
         List<Record> records;
-            User user = userService.findUserByLogin(request);
-            try {
-                records = recordRepository.getRecords()
-                        .stream()
-                        .filter(r -> r.getStatus().equalsIgnoreCase("отдается")
-                                && !r.getUser().equals(user)
-                                && !userService.containsSlot(user, r.getSlot().getId())
-                                && isTimeEqualOrAfter(r))
-                        .toList();
+        try {
+            records = recordRepository.getRecords()
+                    .stream()
+                    .filter(r -> r.getStatus().equalsIgnoreCase("отдается")
+                            && !r.getUser().equals(user)
+                            && !containsSlot(user, r.getSlot().getId())
+                            && isTimeEqualOrAfter(r))
+                    .toList();
 
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        if (records.isEmpty()) {
-            request.setAttribute("isEmptyExchanged", "Нет доступных для обмена смен");
+        } catch (SQLException e) {
+            throw new MySQLException();
+        } catch (ClassNotFoundException e) {
+            throw new ConnectionException();
         }
-        request.setAttribute("records", records);
-
-        return resource;
+        return records;
 
     }
 
-    public String getUserRecords(HttpServletRequest request) {
-        User user = userService.findUserByLogin(request);
-        String recordsType = request.getParameter("recordsType");
-        if(recordsType == null && request.getAttribute("recordsType") != null){
-            recordsType = request.getAttribute("recordsType").toString();
-        }
-        if (recordsType != null) {
-            try {
-                List<Record> records;
-                if (recordsType.equals("completed")) {
-                    records = getRecords(user, r -> !r.getStatus().equalsIgnoreCase("запланирована")
-                                    && !r.getStatus().equalsIgnoreCase("отдается"));
-                    request.setAttribute("tableName", "Завершенные смены");
-                } else if (recordsType.equals("exchanged")) {
-                    records = getRecords(user, r -> r.getStatus().equalsIgnoreCase("отдается")
-                                    && isTimeEqualOrAfter(r));
-                    request.setAttribute("tableName", "Смены для обмена");
-                } else {
-                    records = getRecords(user, r ->
-                                    (r.getStatus().equalsIgnoreCase("запланирована"))
-                                            && isTimeEqualOrAfter(r));
-                    request.setAttribute("tableName", "Запланированные смены");
-                }
-                if (records.isEmpty()){
-                    request.setAttribute("recordsIsEmpty", "Нет доступных смен");
-                } else {
-                    request.setAttribute("records", records);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+    public List<Record> getUserRecords(String recordsType, User user) {
+        try {
+            List<Record> records;
+            if (recordsType.equals("completed")) {
+                records = getRecords(user, r -> !r.getStatus().equalsIgnoreCase("запланирована")
+                        && !r.getStatus().equalsIgnoreCase("отдается"));
+            } else if (recordsType.equals("exchanged")) {
+                records = getRecords(user, r -> r.getStatus().equalsIgnoreCase("отдается")
+                        && isTimeEqualOrAfter(r));
+            } else {
+                records = getRecords(user, r ->
+                        (r.getStatus().equalsIgnoreCase("запланирована"))
+                                && isTimeEqualOrAfter(r));
             }
-        }
-        request.setAttribute("recordsType", recordsType);
-        return "/userRecords.ftl";
+            return records;
 
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
-    public String updateUserRecord(HttpServletRequest request) {
-        String resource = "/userRecords.ftl";
-        User user = userService.findUserByLogin(request);
-        String recordId = request.getParameter("choosedRecordId").split(";")[0];
-        String recordsType = request.getParameter("choosedRecordId").split(";")[1];
-        Long id = Long.parseLong(recordId);
-
+    public void updateUserRecord(User user, String recordsType, Long id) throws MySQLException, ConnectionException {
         List<Record> records;
         try {
             if (recordsType.equals("sheduled")) {
@@ -124,11 +97,21 @@ public class RecordService {
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new MySQLException();
+        } catch (ClassNotFoundException e) {
+            throw new ConnectionException();
         }
-        request.setAttribute("recordsType", recordsType);
-        return resource;
+    }
+
+    private boolean containsSlot(User user, Long slotId) {
+        List<Record> records = user.getRecords();
+        for (Record record : records) {
+            if (record.getSlot().getId().equals(slotId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<Record> getRecords(User user, Predicate<? super Record> predicate) {

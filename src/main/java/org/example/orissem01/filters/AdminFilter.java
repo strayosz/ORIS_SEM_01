@@ -11,14 +11,19 @@ import org.example.orissem01.services.UserService;
 import java.io.IOException;
 
 @WebFilter("/admin/*")
-public class AdminFIlter implements Filter {
+public class AdminFilter implements Filter {
 
-    private final UserService userService = new UserService();
+    private UserService userService;
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException{
+        ServletContext servletContext = filterConfig.getServletContext();
+        this.userService = (UserService) servletContext.getAttribute("userService");
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         HttpSession session = ((HttpServletRequest) request).getSession(false);
-
 
         if ((session == null || session.getAttribute("userLogin") == null)){
             ((HttpServletResponse) response).sendRedirect("/slotSwap/welcome");

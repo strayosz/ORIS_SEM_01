@@ -1,4 +1,4 @@
-package org.example.orissem01.repositories.interfaces;
+package org.example.orissem01.repositories.mappers;
 
 import org.example.orissem01.models.Record;
 import org.example.orissem01.models.Slot;
@@ -7,9 +7,8 @@ import org.example.orissem01.models.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public interface IMapModel {
-
-    default User mapUserDefault(ResultSet resultSet) throws SQLException {
+public class EntityMapper {
+    public User mapUserDefault(ResultSet resultSet) throws SQLException {
         User user = new User();
         Long id = resultSet.getLong  ("a_account_id");
         user.setId      (id);
@@ -21,7 +20,7 @@ public interface IMapModel {
         return user;
     }
 
-    default Slot mapSlotDefault(ResultSet resultSet) throws SQLException {
+    public Slot mapSlotDefault(ResultSet resultSet) throws SQLException {
         Slot slot = new Slot();
         slot.setId      (resultSet.getLong  ("s_slot_id"));
         slot.setName    (resultSet.getString("s_name"));
@@ -31,7 +30,7 @@ public interface IMapModel {
         return slot;
     }
 
-    default Record mapRecordDefault(ResultSet resultSet) throws SQLException {
+    public Record mapRecordDefault(ResultSet resultSet) throws SQLException {
         Record record = new Record();
         record.setId(resultSet.getLong ("r_account_slot_id"));
         record.setChatsCount(resultSet.getInt("r_chats_count"));

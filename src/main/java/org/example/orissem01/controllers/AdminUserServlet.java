@@ -1,5 +1,6 @@
 package org.example.orissem01.controllers;
 
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,7 +14,13 @@ import java.io.IOException;
 @WebServlet("/admin/user")
 public class AdminUserServlet extends HttpServlet {
 
-    private final UserService userService = new UserService();
+    private UserService userService;
+
+    @Override
+    public void init(){
+        ServletContext servletContext = getServletContext();
+        this.userService = (UserService) servletContext.getAttribute("userService");
+    }
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

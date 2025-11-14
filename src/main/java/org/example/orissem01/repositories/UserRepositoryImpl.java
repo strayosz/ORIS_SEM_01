@@ -3,8 +3,8 @@ package org.example.orissem01.repositories;
 import org.example.orissem01.models.Record;
 import org.example.orissem01.models.Slot;
 import org.example.orissem01.models.User;
-import org.example.orissem01.repositories.interfaces.IMapModel;
 import org.example.orissem01.repositories.interfaces.IUserRepository;
+import org.example.orissem01.repositories.mappers.EntityMapper;
 import org.example.orissem01.utils.DBConnection;
 
 import java.sql.Connection;
@@ -15,7 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class UserRepositoryImpl implements IUserRepository, IMapModel {
+public class UserRepositoryImpl implements IUserRepository {
+
+    private final EntityMapper entityMapper;
+
+    public UserRepositoryImpl(EntityMapper entityMapper){
+        this.entityMapper = entityMapper;
+    }
 
     @Override
     public List<User> getAll() throws SQLException, ClassNotFoundException {
@@ -170,15 +176,15 @@ public class UserRepositoryImpl implements IUserRepository, IMapModel {
 
     @Override
     public Record mapRecord(ResultSet resultSet) throws SQLException {
-        Record record = mapRecordDefault(resultSet);
-        Slot slot = mapSlotDefault(resultSet);
+        Record record = entityMapper.mapRecordDefault(resultSet);
+        Slot slot = entityMapper.mapSlotDefault(resultSet);
         record.setSlot(slot);
         return record;
     }
 
     @Override
     public User mapUser(ResultSet resultSet) throws SQLException, ClassNotFoundException {
-        User user = mapUserDefault(resultSet);
+        User user = entityMapper.mapUserDefault(resultSet);
         user.setRecords(getRecordsByUserId(user.getId()));
         return user;
     }

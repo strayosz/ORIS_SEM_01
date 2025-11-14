@@ -10,6 +10,7 @@ import java.io.IOException;
 
 @WebServlet("/welcome")
 public class WelcomeServlet extends HttpServlet {
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher("/welcome.ftl").forward(request, response);

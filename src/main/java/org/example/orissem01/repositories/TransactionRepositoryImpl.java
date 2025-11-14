@@ -3,8 +3,8 @@ package org.example.orissem01.repositories;
 import org.example.orissem01.models.Slot;
 import org.example.orissem01.models.Transaction;
 import org.example.orissem01.models.User;
-import org.example.orissem01.repositories.interfaces.IMapModel;
 import org.example.orissem01.repositories.interfaces.ITransactionRepository;
+import org.example.orissem01.repositories.mappers.EntityMapper;
 import org.example.orissem01.utils.DBConnection;
 
 import java.sql.Connection;
@@ -14,7 +14,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransactionRepositoryImpl implements ITransactionRepository, IMapModel {
+public class TransactionRepositoryImpl implements ITransactionRepository {
+
+    private final EntityMapper entityMapper;
+
+    public TransactionRepositoryImpl(EntityMapper entityMapper){
+        this.entityMapper = entityMapper;
+    }
 
     @Override
     public List<Transaction> getTransactions() throws SQLException, ClassNotFoundException {
@@ -60,7 +66,6 @@ public class TransactionRepositoryImpl implements ITransactionRepository, IMapMo
         String sqlSelectId = "select id from nextval('transaction_id_seq') as id";
         PreparedStatement statement = connection.prepareStatement(sqlSelectId);
         ResultSet resultSet = statement.executeQuery();
-
 
         if(resultSet.next()){
             Long id = resultSet.getLong("id");
@@ -141,9 +146,9 @@ public class TransactionRepositoryImpl implements ITransactionRepository, IMapMo
     @Override
     public Transaction mapTransaction(ResultSet resultSet) throws SQLException {
         Transaction transaction = new Transaction();
-        User fromUser = mapUserDefault(resultSet);
+        User fromUser = entityMapper.mapUserDefault(resultSet);
         User toUser = new User();
-        Slot slot = mapSlotDefault(resultSet);
+        Slot slot = entityMapper.mapSlotDefault(resultSet);
 
         toUser.setId(resultSet.getLong("b_account_id"));
         toUser.setLogin(resultSet.getString("b_login"));
