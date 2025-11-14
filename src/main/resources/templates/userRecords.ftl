@@ -48,7 +48,7 @@
                         <p><b>Статус</b> ${record.status}</p>
                         <#if recordsType == 'completed'>
                         <p><b>Количество чатов</b> ${record.chatsCount!"Не заполнено"}</p>
-                        <p><b>Комментарий</b> ${record.comment!"Отсутствует"}/p>
+                        <p><b>Комментарий</b> ${record.comment!"Отсутствует"}</p>
                         </#if>
                     </div>
                 </div>
