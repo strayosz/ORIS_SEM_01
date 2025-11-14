@@ -30,13 +30,13 @@
         <h2>Введите логин и пароль</h2>
         <div>
             <label>
-                <input type="text" placeholder="Логин" name="login" required>
+                <input type="text" placeholder="Логин" name="login" required minlength="8">
             </label>
         </div>
 
         <div>
             <label>
-                <input type="password" placeholder="Пароль" name="password" required>
+                <input type="password" placeholder="Пароль" name="password" required minlength="8">
             </label>
         </div>
 

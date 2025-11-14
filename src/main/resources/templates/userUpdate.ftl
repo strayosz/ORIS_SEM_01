@@ -40,12 +40,12 @@
         </div>
         <div>
             <label>
-                <input type="password" name="oldPassword" placeholder="Старый Пароль" required>
+                <input type="password" name="oldPassword" placeholder="Старый Пароль" required minlength="8">
             </label>
         </div>
         <div>
             <label>
-                <input type="password" name="newPassword" placeholder="Новый Пароль" required>
+                <input type="password" name="newPassword" placeholder="Новый Пароль" required minlength="8">
             </label>
         </div>
         <div class="buttons" style="justify-content: center">
